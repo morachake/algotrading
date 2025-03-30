@@ -1,0 +1,17 @@
+pandas
+numpy
+matplotlib
+scikit-learn
+tensorflow
+keras
+nltk
+textblob
+vaderSentiment
+yfinance
+alpha_vantage
+backtrader
+pyfolio
+requests
+beautifulsoup4
+dash
+plotly
