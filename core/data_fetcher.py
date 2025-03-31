@@ -29,6 +29,27 @@ def fetch_market_data(tickers, start_date, end_date=None):
             # Get historical data
             df = yf.download(ticker, start=start_date, end=end_date)
             
+            # If df has MultiIndex columns, flatten them
+            if isinstance(df.columns, pd.MultiIndex):
+                # Select just the data for this ticker (needed for multiple tickers)
+                if ticker in df.columns.levels[1]:
+                    # Get the specific ticker data
+                    ticker_data = pd.DataFrame()
+                    for col in df.columns.levels[0]:
+                        ticker_data[col] = df[(col, ticker)]
+                    df = ticker_data
+                else:
+                    # If using a single ticker, column names might be different
+                    # Flatten the columns directly
+                    df.columns = [col[0] for col in df.columns]
+            
+            # In newer versions of yfinance, the column is 'Close' instead of 'Adj Close'
+            # Let's handle both cases
+            if 'Adj Close' not in df.columns:
+                if 'Close' in df.columns:
+                    df['Adj Close'] = df['Close']
+                    print(f"Added 'Adj Close' column (copy of 'Close')")
+            
             # Calculate returns
             df['Returns'] = df['Adj Close'].pct_change()
             
